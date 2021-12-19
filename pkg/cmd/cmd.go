@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/czar0/fabkit-cli/pkg/cmd/generate"
 	"github.com/czar0/fabkit-cli/pkg/cmd/network"
 
 	"github.com/spf13/cobra"
@@ -55,6 +56,7 @@ func init() {
 	viper.SetDefault("license", "apache")
 
 	rootCmd.AddCommand(network.NewCmdNetwork())
+	rootCmd.AddCommand(generate.NewGenerateCmd())
 }
 
 func initConfig() {

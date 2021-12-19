@@ -17,7 +17,7 @@ import (
 
 // NewCmdNetworkInstall implements the method to install all the necessary dependencies for running a network
 // TODO: Implement flag (-v, --version) to allow user to provide in input a specific version to install
-func NewCmdNetworkInstall() *cobra.Command {
+func newCmdNetworkInstall() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "install",
 		Aliases: []string{"i"},
