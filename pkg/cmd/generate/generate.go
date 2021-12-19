@@ -6,15 +6,15 @@ package generate
 
 import (
 	"context"
+	"fmt"
 	"log"
-	"os"
 
 	"github.com/czar0/fabkit-cli/internal/docker"
+	"github.com/czar0/fabkit-cli/internal/spinner"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
-	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/spf13/cobra"
 )
 
@@ -34,6 +34,9 @@ func NewGenerateCmd() *cobra.Command {
 			if err := docker.CheckServerRunning(); err != nil {
 				log.Fatalln(err)
 			}
+
+			spinner.Spin.Start()
+			spinner.Spin.Suffix = fmt.Sprintf(" Generating cryptos")
 
 			resp, err := cli.ContainerCreate(ctx, &container.Config{
 				Image: "hyperledger/fabric-tools:2.3.3",
@@ -58,25 +61,19 @@ func NewGenerateCmd() *cobra.Command {
 			}
 
 			if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
-				panic(err)
+				log.Fatalln(err)
 			}
 
 			statusCh, errCh := cli.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
 			select {
 			case err := <-errCh:
 				if err != nil {
-					panic(err)
+					log.Fatalln(err)
 				}
 			case <-statusCh:
 			}
 
-			out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true})
-			if err != nil {
-				panic(err)
-			}
-
-			stdcopy.StdCopy(os.Stdout, os.Stderr, out)
-
+			spinner.Spin.Stop()
 		},
 	}
 }
